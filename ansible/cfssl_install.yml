@@ -3,23 +3,90 @@
   hosts: all
   become: true
   tasks:
+    - name: Configurer des DNS fiables
+      copy:
+        dest: /etc/resolv.conf
+        content: |
+          nameserver 8.8.8.8
+          nameserver 1.1.1.1
+        backup: yes
+
+    - name: Configurer des sources APT alternatives plus fiables
+      copy:
+        dest: /etc/apt/sources.list
+        content: |
+          deb http://fr.archive.ubuntu.com/ubuntu/ bionic main restricted universe multiverse
+          deb http://fr.archive.ubuntu.com/ubuntu/ bionic-updates main restricted universe multiverse
+          deb http://fr.archive.ubuntu.com/ubuntu/ bionic-backports main restricted universe multiverse
+          deb http://security.ubuntu.com/ubuntu bionic-security main restricted universe multiverse
+        backup: yes
+
+    - name: Nettoyer le cache APT
+      shell: |
+        apt-get clean
+        rm -rf /var/lib/apt/lists/*
+
+    - name: Mettre à jour le cache APT avec retry
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+      retries: 3
+      delay: 10
+
+    - name: Installer les paquets nécessaires avec retry
+      apt:
+        name:
+          - ca-certificates
+          - curl
+          - wget
+        state: present
+        force_apt_get: yes
+      retries: 3
+      delay: 10
+
     - name: Créer le répertoire pour CFSSL
       file:
         path: /opt/cfssl
         state: directory
         mode: '0755'
 
-    - name: Télécharger CFSSL
-      get_url:
-        url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_amd64
-        dest: /opt/cfssl/cfssl
-        mode: '0755'
-
-    - name: Télécharger CFSSLJSON
-      get_url:
-        url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_amd64
-        dest: /opt/cfssl/cfssljson
-        mode: '0755'
+    - name: Télécharger CFSSL avec retry
+      block:
+        - name: Télécharger cfssl
+          get_url:
+            url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_amd64
+            dest: /opt/cfssl/cfssl
+            mode: '0755'
+            timeout: 30
+          retries: 3
+          delay: 10
+          
+        - name: Télécharger cfssljson
+          get_url:
+            url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_amd64
+            dest: /opt/cfssl/cfssljson
+            mode: '0755'
+            timeout: 30
+          retries: 3
+          delay: 10
+          
+      rescue:
+        - name: Fallback - Installation via apt si disponible
+          apt:
+            name: golang-cfssl
+            state: present
+            update_cache: yes
+          ignore_errors: yes
+          
+        - name: Vérifier si CFSSL est installé
+          command: which cfssl
+          register: cfssl_check
+          ignore_errors: yes
+          
+        - name: Échec si CFSSL n'est pas disponible
+          fail:
+            msg: "Impossible d'installer CFSSL"
+          when: cfssl_check.rc != 0
 
     - name: Créer des liens symboliques
       file:
@@ -30,10 +97,237 @@
         - cfssl
         - cfssljson
 
-    - name: Installer les dépendances
+    - name: Installer jq et curl avec retry
       apt:
         name:
-          - curl
           - jq
+          - curl
         state: present
-        update_cache: yes 
+        force_apt_get: yes
+      retries: 3
+      delay: 10
+
+    - name: Créer le répertoire pour la PKI
+      file:
+        path: /opt/cfssl
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Créer la configuration CA root
+      copy:
+        content: |
+          {
+            "CN": "Secure Bank Root CA",
+            "key": {
+              "algo": "rsa",
+              "size": 4096
+            },
+            "names": [
+              {
+                "C": "FR",
+                "L": "Paris",
+                "O": "Secure Bank",
+                "OU": "IT Department",
+                "ST": "Ile-de-France"
+              }
+            ],
+            "ca": {
+              "expiry": "87600h"
+            }
+          }
+        dest: /opt/cfssl/ca-root-csr.json
+        mode: '0644'
+
+    - name: Créer la configuration CA intermédiaire
+      copy:
+        content: |
+          {
+            "CN": "Secure Bank Intermediate CA",
+            "key": {
+              "algo": "rsa",
+              "size": 2048
+            },
+            "names": [
+              {
+                "C": "FR",
+                "L": "Paris",
+                "O": "Secure Bank",
+                "OU": "IT Department",
+                "ST": "Ile-de-France"
+              }
+            ]
+          }
+        dest: /opt/cfssl/ca-intermediate-csr.json
+        mode: '0644'
+
+    - name: Créer la configuration pour les certificats serveur
+      copy:
+        content: |
+          {
+            "signing": {
+              "default": {
+                "expiry": "8760h"
+              },
+              "profiles": {
+                "server": {
+                  "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth"
+                  ],
+                  "expiry": "8760h"
+                },
+                "client": {
+                  "usages": [
+                    "signing",
+                    "key encipherment",
+                    "client auth"
+                  ],
+                  "expiry": "8760h"
+                },
+                "intermediate": {
+                  "usages": [
+                    "signing",
+                    "key encipherment",
+                    "cert sign",
+                    "crl sign"
+                  ],
+                  "expiry": "43800h",
+                  "ca_constraint": {
+                    "is_ca": true,
+                    "max_path_len": 1
+                  }
+                }
+              }
+            }
+          }
+        dest: /opt/cfssl/config.json
+        mode: '0644'
+
+    - name: Générer la CA root
+      shell: |
+        cd /opt/cfssl
+        cfssl gencert -initca ca-root-csr.json | cfssljson -bare ca-root
+      args:
+        creates: /opt/cfssl/ca-root.pem
+
+    - name: Générer la CA intermédiaire
+      shell: |
+        cd /opt/cfssl
+        cfssl gencert -ca ca-root.pem -ca-key ca-root-key.pem -config config.json -profile intermediate ca-intermediate-csr.json | cfssljson -bare ca-intermediate
+      args:
+        creates: /opt/cfssl/ca-intermediate.pem
+
+    - name: Créer le fichier de configuration de l'API CFSSL
+      copy:
+        content: |
+          {
+            "signing": {
+              "default": {
+                "expiry": "8760h"
+              },
+              "profiles": {
+                "server": {
+                  "usages": [
+                    "signing",
+                    "key encipherment",
+                    "server auth"
+                  ],
+                  "expiry": "8760h"
+                }
+              }
+            }
+          }
+        dest: /opt/cfssl/api-config.json
+        mode: '0644'
+
+    - name: Créer le service systemd pour l'API CFSSL
+      copy:
+        content: |
+          [Unit]
+          Description=CFSSL API Server
+          After=network.target
+
+          [Service]
+          Type=simple
+          User=root
+          WorkingDirectory=/opt/cfssl
+          ExecStart=/usr/local/bin/cfssl serve -ca ca-intermediate.pem -ca-key ca-intermediate-key.pem -config api-config.json -address 0.0.0.0 -port 8888
+          Restart=always
+          RestartSec=5
+
+          [Install]
+          WantedBy=multi-user.target
+        dest: /etc/systemd/system/cfssl-api.service
+        mode: '0644'
+
+    - name: Recharger systemd
+      systemd:
+        daemon_reload: yes
+
+    - name: Démarrer et activer le service CFSSL API
+      systemd:
+        name: cfssl-api
+        state: started
+        enabled: yes
+
+    - name: Attendre que l'API CFSSL soit prête
+      wait_for:
+        port: 8888
+        host: 0.0.0.0
+        delay: 5
+        timeout: 30
+
+    - name: Configurer nginx pour servir les certificats CA
+      copy:
+        content: |
+          server {
+              listen 80;
+              server_name _;
+              
+              location /ca-root.pem {
+                  alias /opt/cfssl/ca-root.pem;
+                  add_header Content-Type application/x-pem-file;
+              }
+              
+              location /ca-intermediate.pem {
+                  alias /opt/cfssl/ca-intermediate.pem;
+                  add_header Content-Type application/x-pem-file;
+              }
+              
+              location /ca-chain.pem {
+                  alias /opt/cfssl/ca-chain.pem;
+                  add_header Content-Type application/x-pem-file;
+              }
+          }
+        dest: /etc/nginx/sites-available/cfssl-ca
+        mode: '0644'
+
+    - name: Créer la chaîne de certificats complète
+      shell: |
+        cd /opt/cfssl
+        cat ca-intermediate.pem ca-root.pem > ca-chain.pem
+      args:
+        creates: /opt/cfssl/ca-chain.pem
+
+    - name: Activer le site nginx
+      file:
+        src: /etc/nginx/sites-available/cfssl-ca
+        dest: /etc/nginx/sites-enabled/cfssl-ca
+        state: link
+
+    - name: Redémarrer nginx
+      systemd:
+        name: nginx
+        state: restarted
+
+    - name: Afficher les informations de la PKI
+      debug:
+        msg: |
+          PKI CFSSL installée avec succès !
+          - API CFSSL : http://192.168.56.41:8888
+          - CA Root : http://192.168.56.41/ca-root.pem
+          - CA Intermédiaire : http://192.168.56.41/ca-intermediate.pem
+          - Chaîne complète : http://192.168.56.41/ca-chain.pem 

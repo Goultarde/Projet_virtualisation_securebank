@@ -8,3 +8,4 @@
         docker compose -f docker-compose.yaml up -d
       args:
         chdir: "/home/vagrant/ansible/docker" 
+ 
