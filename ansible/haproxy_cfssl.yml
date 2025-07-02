@@ -21,6 +21,13 @@
         state: directory
         mode: '0755'
 
+    - name: Ajouter securebank.com dans /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "127.0.0.1 securebank.com"
+        regexp: ".*securebank\\.com"
+        state: present
+
     - name: Créer le CSR pour securebank.com
       copy:
         dest: /tmp/securebank-csr.json
@@ -60,6 +67,15 @@
       retries: 30
       delay: 10
 
+    - name: Attendre que SecureBank soit disponible
+      uri:
+        url: http://127.0.0.1:1337
+        method: GET
+      register: securebank_health
+      until: securebank_health.status == 200
+      retries: 30
+      delay: 10
+
     - name: Générer le certificat via l'API CFSSL
       shell: |
         curl -s -X POST "{{ cfssl_api_url }}/api/v1/cfssl/newcert" \
@@ -84,38 +100,25 @@
         jq -r '.result.private_key' /tmp/cfssl_response.json > /etc/haproxy/certs/securebank.key
         chmod 600 /etc/haproxy/certs/securebank.key
 
-    - name: Récupérer la chaîne de certificats (CA intermédiaire)
-      shell: |
-        curl -s -X POST "{{ cfssl_api_url }}/api/v1/cfssl/info" \
-          -H "Content-Type: application/json" \
-          -d '{}'
+    - name: Récupérer la CA intermédiaire via l'API CFSSL
+      uri:
+        url: "{{ cfssl_api_url }}/api/v1/cfssl/info"
+        method: POST
+        headers:
+          Content-Type: application/json
+        body: '{}'
       register: ca_info
-      args:
-        warn: false
-
-    - name: Sauvegarder la réponse CA dans un fichier temporaire
-      copy:
-        content: "{{ ca_info.stdout }}"
-        dest: /tmp/ca_info.json
-        mode: '0644'
 
     - name: Extraire et sauvegarder le certificat CA intermédiaire
       shell: |
-        jq -r '.result.certificate' /tmp/ca_info.json > /etc/haproxy/certs/ca-intermediate.crt
+        echo '{{ ca_info.json.result.certificate }}' > /etc/haproxy/certs/ca-intermediate.crt
 
-    - name: Créer un certificat CA Root temporaire (auto-signé pour la chaîne)
-      shell: |
-        # Pour l'instant, on va dupliquer la CA intermédiaire comme placeholder
-        # En production, il faudrait récupérer la vraie CA Root
-        cp /etc/haproxy/certs/ca-intermediate.crt /etc/haproxy/certs/ca-root.crt
-
-    - name: Créer le fichier PEM pour HAProxy (cert + CA intermédiaire + CA root + clé)
+    - name: Créer le fichier PEM pour HAProxy (cert + CA intermédiaire + clé)
       shell: |
         # Vérifier que tous les fichiers existent et ne sont pas vides
         if [ -s /etc/haproxy/certs/securebank.crt ] && [ -s /etc/haproxy/certs/securebank.key ] && [ -s /etc/haproxy/certs/ca-intermediate.crt ]; then
           cat /etc/haproxy/certs/securebank.crt \
               /etc/haproxy/certs/ca-intermediate.crt \
-              /etc/haproxy/certs/ca-root.crt \
               /etc/haproxy/certs/securebank.key > /etc/haproxy/certs/securebank.pem
           chmod 600 /etc/haproxy/certs/securebank.pem
         else
@@ -164,8 +167,7 @@
               bind *:443 ssl crt /etc/haproxy/certs/securebank.pem
               # Redirection vers {{ domain_name }} si ce n'est pas déjà le cas
               redirect location https://{{ domain_name }}%[req.uri] code 301 if !{ hdr(host) -i {{ domain_name }} }
-              default_backend securebank_servers
-
+              
               # Headers de protection
               http-response set-header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
               http-response set-header X-Frame-Options "DENY"
@@ -173,11 +175,28 @@
               http-response set-header X-XSS-Protection "1; mode=block"
               http-response set-header Referrer-Policy "no-referrer"
               http-response set-header Permissions-Policy "geolocation=(), microphone=(), camera=()"
+              
+              # Route vers StoreAPI
+              use_backend storeapi_servers if { path_beg /api/Store }
+              
+              # Route par défaut vers SecureBank
+              default_backend securebank_servers
 
           backend securebank_servers
               balance roundrobin
               option httpchk GET /
+              option forwardfor
+              http-request set-header X-Forwarded-Port %[dst_port]
+              http-request add-header X-Forwarded-Proto https if { ssl_fc }
               server securebank 127.0.0.1:1337 check
+
+          backend storeapi_servers
+              balance roundrobin
+              option httpchk GET /
+              option forwardfor
+              http-request set-header X-Forwarded-Port %[dst_port]
+              http-request add-header X-Forwarded-Proto https if { ssl_fc }
+              server storeapi 127.0.0.1:1338 check
       notify:
         - Restart haproxy
 
