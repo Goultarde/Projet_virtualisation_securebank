@@ -1,0 +1,39 @@
+---
+- name: Installer CFSSL
+  hosts: all
+  become: true
+  tasks:
+    - name: Créer le répertoire pour CFSSL
+      file:
+        path: /opt/cfssl
+        state: directory
+        mode: '0755'
+
+    - name: Télécharger CFSSL
+      get_url:
+        url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssl_1.6.4_linux_amd64
+        dest: /opt/cfssl/cfssl
+        mode: '0755'
+
+    - name: Télécharger CFSSLJSON
+      get_url:
+        url: https://github.com/cloudflare/cfssl/releases/download/v1.6.4/cfssljson_1.6.4_linux_amd64
+        dest: /opt/cfssl/cfssljson
+        mode: '0755'
+
+    - name: Créer des liens symboliques
+      file:
+        src: "/opt/cfssl/{{ item }}"
+        dest: "/usr/local/bin/{{ item }}"
+        state: link
+      loop:
+        - cfssl
+        - cfssljson
+
+    - name: Installer les dépendances
+      apt:
+        name:
+          - curl
+          - jq
+        state: present
+        update_cache: yes 

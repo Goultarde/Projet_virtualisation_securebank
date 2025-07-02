@@ -1,0 +1,4 @@
+---
+- import_playbook: docker_install.yml
+- import_playbook: securebank_web.yml
+- import_playbook: haproxy_cfssl.yml 

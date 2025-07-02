@@ -1,0 +1,1 @@
+{"virtualbox":{"/home/vagrant/ansible":{"guestpath":"/home/vagrant/ansible","hostpath":"/home/harouna/Documents/Oteria/virtualiasation/PROJET_FINAL/ansible","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/home/harouna/Documents/Oteria/virtualiasation/PROJET_FINAL/vagrant","disabled":false,"__vagrantfile":true}}}

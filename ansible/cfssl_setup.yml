@@ -1,0 +1,182 @@
+---
+- name: Configurer la PKI CFSSL
+  hosts: all
+  become: true
+  tasks:
+    - name: Créer le répertoire de la PKI
+      file:
+        path: /etc/cfssl
+        state: directory
+        mode: '0755'
+
+    - name: Créer la configuration CA Root
+      copy:
+        dest: /etc/cfssl/ca-root-config.json
+        content: |
+          {
+            "signing": {
+              "default": {
+                "expiry": "87600h"
+              },
+              "profiles": {
+                "intermediate": {
+                  "usages": [
+                    "signing",
+                    "digital signature",
+                    "key encipherment",
+                    "cert sign",
+                    "crl sign",
+                    "server auth",
+                    "client auth"
+                  ],
+                  "expiry": "43800h",
+                  "ca_constraint": {
+                    "is_ca": true,
+                    "max_path_len": 0,
+                    "max_path_len_zero": true
+                  }
+                }
+              }
+            }
+          }
+
+    - name: Créer le CSR CA Root
+      copy:
+        dest: /etc/cfssl/ca-root-csr.json
+        content: |
+          {
+            "CN": "SecureBank Root CA",
+            "key": {
+              "algo": "rsa",
+              "size": 4096
+            },
+            "names": [
+              {
+                "C": "FR",
+                "ST": "France",
+                "L": "Paris",
+                "O": "SecureBank",
+                "OU": "SecureBank Root CA"
+              }
+            ],
+            "ca": {
+              "expiry": "87600h"
+            }
+          }
+
+    - name: Générer la CA Root
+      shell: |
+        cd /etc/cfssl
+        cfssl gencert -initca ca-root-csr.json | cfssljson -bare ca-root
+      args:
+        creates: /etc/cfssl/ca-root.pem
+
+    - name: Créer la configuration CA Intermédiaire
+      copy:
+        dest: /etc/cfssl/ca-intermediate-config.json
+        content: |
+          {
+            "signing": {
+              "default": {
+                "expiry": "8760h"
+              },
+              "profiles": {
+                "server": {
+                  "usages": [
+                    "signing",
+                    "digital signature",
+                    "key encipherment",
+                    "server auth"
+                  ],
+                  "expiry": "8760h"
+                },
+                "client": {
+                  "usages": [
+                    "signing",
+                    "digital signature",
+                    "key encipherment",
+                    "client auth"
+                  ],
+                  "expiry": "8760h"
+                }
+              }
+            }
+          }
+
+    - name: Créer le CSR CA Intermédiaire
+      copy:
+        dest: /etc/cfssl/ca-intermediate-csr.json
+        content: |
+          {
+            "CN": "SecureBank Intermediate CA",
+            "key": {
+              "algo": "rsa",
+              "size": 2048
+            },
+            "names": [
+              {
+                "C": "FR",
+                "ST": "France",
+                "L": "Paris",
+                "O": "SecureBank",
+                "OU": "SecureBank Intermediate CA"
+              }
+            ]
+          }
+
+    - name: Générer la CA Intermédiaire
+      shell: |
+        cd /etc/cfssl
+        cfssl gencert -ca ca-root.pem -ca-key ca-root-key.pem -config ca-root-config.json -profile intermediate ca-intermediate-csr.json | cfssljson -bare ca-intermediate
+      args:
+        creates: /etc/cfssl/ca-intermediate.pem
+
+    - name: Créer le service systemd pour CFSSL
+      copy:
+        dest: /etc/systemd/system/cfssl.service
+        content: |
+          [Unit]
+          Description=CFSSL API Server
+          After=network.target
+
+          [Service]
+          Type=simple
+          User=root
+          WorkingDirectory=/etc/cfssl
+          ExecStart=/usr/local/bin/cfssl serve -address=0.0.0.0 -port=8888 -ca-key=ca-intermediate-key.pem -ca=ca-intermediate.pem -config=ca-intermediate-config.json
+          Restart=always
+          RestartSec=5
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Démarrer et activer le service CFSSL
+      systemd:
+        name: cfssl
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Installer nginx pour servir les certificats
+      apt:
+        name: nginx
+        state: present
+
+    - name: Créer le répertoire web si nécessaire
+      file:
+        path: /var/www/html
+        state: directory
+        mode: '0755'
+
+    - name: Exposer le certificat CA Root via HTTP
+      copy:
+        src: /etc/cfssl/ca-root.pem
+        dest: /var/www/html/ca-root.pem
+        remote_src: yes
+        mode: '0644'
+
+    - name: Démarrer et activer nginx
+      systemd:
+        name: nginx
+        state: started
+        enabled: yes 

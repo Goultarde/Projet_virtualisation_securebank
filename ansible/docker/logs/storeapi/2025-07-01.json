@@ -1,0 +1,54 @@
+{ "time": "2025-07-01 20:13:41.1450", "level": "DEBUG", "function": "StoreAPI.Program.Main", "message": "init main" }
+{ "time": "2025-07-01 20:13:41.9592", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:13:56.7560", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.CreateDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:13:56.7665", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:13:56.7687", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.InitializeDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:13:56.8293", "level": "INFO", "function": "Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync", "message": "Now listening on: http:\/\/[::]:80" }
+{ "time": "2025-07-01 20:13:56.8395", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Application started. Press Ctrl+C to shut down." }
+{ "time": "2025-07-01 20:13:56.8395", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Hosting environment: Production" }
+{ "time": "2025-07-01 20:13:56.8395", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Content root path: \/app" }
+{ "time": "2025-07-01 20:22:01.7324", "level": "DEBUG", "function": "StoreAPI.Program.Main", "message": "init main" }
+{ "time": "2025-07-01 20:22:02.6385", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:22:17.4464", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.CreateDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:22:17.4552", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:22:17.4581", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.InitializeDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:22:17.5171", "level": "INFO", "function": "Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync", "message": "Now listening on: http:\/\/[::]:80" }
+{ "time": "2025-07-01 20:22:17.5171", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Application started. Press Ctrl+C to shut down." }
+{ "time": "2025-07-01 20:22:17.5201", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Hosting environment: Production" }
+{ "time": "2025-07-01 20:22:17.5201", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Content root path: \/app" }
+{ "time": "2025-07-01 20:29:26.7662", "level": "DEBUG", "function": "StoreAPI.Program.Main", "message": "init main" }
+{ "time": "2025-07-01 20:29:27.5304", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:29:42.2965", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.CreateDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:29:42.3058", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:29:42.3058", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.InitializeDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:29:42.3761", "level": "INFO", "function": "Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync", "message": "Now listening on: http:\/\/[::]:80" }
+{ "time": "2025-07-01 20:29:42.3815", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Application started. Press Ctrl+C to shut down." }
+{ "time": "2025-07-01 20:29:42.3815", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Hosting environment: Production" }
+{ "time": "2025-07-01 20:29:42.3815", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Content root path: \/app" }
+{ "time": "2025-07-01 20:40:16.1119", "level": "DEBUG", "function": "StoreAPI.Program.Main", "message": "init main" }
+{ "time": "2025-07-01 20:40:16.9613", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:40:31.9306", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.CreateDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:40:31.9579", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 20:40:31.9635", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.InitializeDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 20:40:32.0911", "level": "INFO", "function": "Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync", "message": "Now listening on: http:\/\/[::]:80" }
+{ "time": "2025-07-01 20:40:32.0998", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Application started. Press Ctrl+C to shut down." }
+{ "time": "2025-07-01 20:40:32.1080", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Hosting environment: Production" }
+{ "time": "2025-07-01 20:40:32.1080", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Content root path: \/app" }
+{ "time": "2025-07-01 21:07:23.6694", "level": "DEBUG", "function": "StoreAPI.Program.Main", "message": "init main" }
+{ "time": "2025-07-01 21:07:24.4364", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 21:07:39.2088", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.CreateDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 21:07:39.2194", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 21:07:39.2221", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.InitializeDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 21:07:39.2896", "level": "INFO", "function": "Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync", "message": "Now listening on: http:\/\/[::]:80" }
+{ "time": "2025-07-01 21:07:39.2940", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Application started. Press Ctrl+C to shut down." }
+{ "time": "2025-07-01 21:07:39.2940", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Hosting environment: Production" }
+{ "time": "2025-07-01 21:07:39.2940", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Content root path: \/app" }
+{ "time": "2025-07-01 21:32:49.9165", "level": "DEBUG", "function": "StoreAPI.Program.Main", "message": "init main" }
+{ "time": "2025-07-01 21:32:50.7707", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 21:33:05.6234", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.CreateDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 21:33:05.6347", "level": "INFO", "function": "Microsoft.EntityFrameworkCore.Diagnostics.EventDefinition`4.Log", "message": "Entity Framework Core 3.1.3 initialized 'StoreContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None" }
+{ "time": "2025-07-01 21:33:05.6375", "level": "ERROR", "function": "StoreAPI.DAL.DBInitializer.InitializeDatabase", "message": "An error occurred while seeding the database." }
+{ "time": "2025-07-01 21:33:05.7022", "level": "INFO", "function": "Microsoft.AspNetCore.Hosting.GenericWebHostService.StartAsync", "message": "Now listening on: http:\/\/[::]:80" }
+{ "time": "2025-07-01 21:33:05.7044", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Application started. Press Ctrl+C to shut down." }
+{ "time": "2025-07-01 21:33:05.7089", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Hosting environment: Production" }
+{ "time": "2025-07-01 21:33:05.7089", "level": "INFO", "function": "Microsoft.Extensions.Hosting.Internal.ConsoleLifetime.OnApplicationStarted", "message": "Content root path: \/app" }

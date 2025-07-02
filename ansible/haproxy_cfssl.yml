@@ -1,0 +1,220 @@
+---
+- name: Installer et configurer HAProxy avec certificats CFSSL
+  hosts: all
+  become: true
+  vars:
+    cfssl_api_url: "http://192.168.56.41:8888"
+    domain_name: "securebank.com"
+  tasks:
+    - name: Installer HAProxy et dépendances
+      apt:
+        name: 
+          - haproxy
+          - jq
+          - curl
+        state: present
+        update_cache: yes
+
+    - name: Créer le répertoire pour les certificats SSL
+      file:
+        path: /etc/haproxy/certs
+        state: directory
+        mode: '0755'
+
+    - name: Créer le CSR pour securebank.com
+      copy:
+        dest: /tmp/securebank-csr.json
+        content: |
+          {
+            "request": {
+              "CN": "{{ domain_name }}",
+              "key": {
+                "algo": "rsa",
+                "size": 2048
+              },
+              "names": [
+                {
+                  "C": "FR",
+                  "ST": "France",
+                  "L": "Paris",
+                  "O": "SecureBank",
+                  "OU": "SecureBank Web"
+                }
+              ],
+              "hosts": [
+                "{{ domain_name }}",
+                "www.{{ domain_name }}",
+                "192.168.56.40",
+                "localhost"
+              ]
+            },
+            "profile": "server"
+          }
+
+    - name: Attendre que l'API CFSSL soit disponible
+      uri:
+        url: "{{ cfssl_api_url }}/api/v1/cfssl/health"
+        method: GET
+      register: cfssl_health
+      until: cfssl_health.status == 200
+      retries: 30
+      delay: 10
+
+    - name: Générer le certificat via l'API CFSSL
+      shell: |
+        curl -s -X POST "{{ cfssl_api_url }}/api/v1/cfssl/newcert" \
+          -H "Content-Type: application/json" \
+          -d @/tmp/securebank-csr.json
+      register: cfssl_response
+      args:
+        warn: false
+
+    - name: Sauvegarder la réponse CFSSL dans un fichier temporaire
+      copy:
+        content: "{{ cfssl_response.stdout }}"
+        dest: /tmp/cfssl_response.json
+        mode: '0644'
+
+    - name: Extraire et sauvegarder le certificat
+      shell: |
+        jq -r '.result.certificate' /tmp/cfssl_response.json > /etc/haproxy/certs/securebank.crt
+      
+    - name: Extraire et sauvegarder la clé privée
+      shell: |
+        jq -r '.result.private_key' /tmp/cfssl_response.json > /etc/haproxy/certs/securebank.key
+        chmod 600 /etc/haproxy/certs/securebank.key
+
+    - name: Récupérer la chaîne de certificats (CA intermédiaire)
+      shell: |
+        curl -s -X POST "{{ cfssl_api_url }}/api/v1/cfssl/info" \
+          -H "Content-Type: application/json" \
+          -d '{}'
+      register: ca_info
+      args:
+        warn: false
+
+    - name: Sauvegarder la réponse CA dans un fichier temporaire
+      copy:
+        content: "{{ ca_info.stdout }}"
+        dest: /tmp/ca_info.json
+        mode: '0644'
+
+    - name: Extraire et sauvegarder le certificat CA intermédiaire
+      shell: |
+        jq -r '.result.certificate' /tmp/ca_info.json > /etc/haproxy/certs/ca-intermediate.crt
+
+    - name: Récupérer le certificat CA Root depuis le serveur PKI
+      shell: |
+        curl -s http://192.168.56.41/ca-root.pem > /etc/haproxy/certs/ca-root.crt
+      args:
+        warn: false
+
+    - name: Créer le fichier PEM pour HAProxy (cert + CA intermédiaire + CA root + clé)
+      shell: |
+        # Vérifier que tous les fichiers existent et ne sont pas vides
+        if [ -s /etc/haproxy/certs/securebank.crt ] && [ -s /etc/haproxy/certs/securebank.key ] && [ -s /etc/haproxy/certs/ca-intermediate.crt ]; then
+          cat /etc/haproxy/certs/securebank.crt \
+              /etc/haproxy/certs/ca-intermediate.crt \
+              /etc/haproxy/certs/ca-root.crt \
+              /etc/haproxy/certs/securebank.key > /etc/haproxy/certs/securebank.pem
+          chmod 600 /etc/haproxy/certs/securebank.pem
+        else
+          echo "Erreur: Un ou plusieurs fichiers de certificats sont manquants ou vides"
+          exit 1
+        fi
+
+    - name: Configurer HAProxy avec headers de protection
+      copy:
+        dest: /etc/haproxy/haproxy.cfg
+        content: |
+          global
+              log /dev/log local0
+              ssl-default-bind-ciphers PROFILE=SYSTEM
+              ssl-default-bind-options no-sslv3 no-tls-tickets
+              chroot /var/lib/haproxy
+              stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+              stats timeout 30s
+              user haproxy
+              group haproxy
+              daemon
+
+          defaults
+              log global
+              mode http
+              option httplog
+              timeout connect 5000ms
+              timeout client  50000ms
+              timeout server  50000ms
+              errorfile 400 /etc/haproxy/errors/400.http
+              errorfile 403 /etc/haproxy/errors/403.http
+              errorfile 408 /etc/haproxy/errors/408.http
+              errorfile 500 /etc/haproxy/errors/500.http
+              errorfile 502 /etc/haproxy/errors/502.http
+              errorfile 503 /etc/haproxy/errors/503.http
+              errorfile 504 /etc/haproxy/errors/504.http
+
+          frontend http_front
+              bind *:80
+              # Redirection vers {{ domain_name }} si ce n'est pas déjà le cas
+              redirect location https://{{ domain_name }}%[req.uri] code 301 if !{ hdr(host) -i {{ domain_name }} }
+              # Redirection HTTP vers HTTPS pour {{ domain_name }}
+              redirect scheme https code 301 if { hdr(host) -i {{ domain_name }} }
+
+          frontend https_front
+              bind *:443 ssl crt /etc/haproxy/certs/securebank.pem
+              # Redirection vers {{ domain_name }} si ce n'est pas déjà le cas
+              redirect location https://{{ domain_name }}%[req.uri] code 301 if !{ hdr(host) -i {{ domain_name }} }
+              default_backend securebank_servers
+
+              # Headers de protection
+              http-response set-header Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+              http-response set-header X-Frame-Options "DENY"
+              http-response set-header X-Content-Type-Options "nosniff"
+              http-response set-header X-XSS-Protection "1; mode=block"
+              http-response set-header Referrer-Policy "no-referrer"
+              http-response set-header Permissions-Policy "geolocation=(), microphone=(), camera=()"
+
+          backend securebank_servers
+              balance roundrobin
+              option httpchk GET /
+              server securebank 127.0.0.1:1337 check
+      notify:
+        - Restart haproxy
+
+    - name: Créer un script de renouvellement automatique des certificats
+      copy:
+        dest: /usr/local/bin/renew-cert.sh
+        mode: '0755'
+        content: |
+          #!/bin/bash
+          CFSSL_API="{{ cfssl_api_url }}"
+          DOMAIN="{{ domain_name }}"
+          
+          # Générer nouveau certificat
+          curl -s -X POST "$CFSSL_API/api/v1/cfssl/newcert" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/securebank-csr.json | jq -r '.result.certificate' > /tmp/new-cert.crt
+          
+          curl -s -X POST "$CFSSL_API/api/v1/cfssl/newcert" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/securebank-csr.json | jq -r '.result.private_key' > /tmp/new-cert.key
+          
+          # Recréer le fichier PEM
+          cat /tmp/new-cert.crt /etc/haproxy/certs/ca-intermediate.crt /tmp/new-cert.key > /etc/haproxy/certs/securebank.pem
+          
+          # Recharger HAProxy
+          systemctl reload haproxy
+
+    - name: Créer une tâche cron pour le renouvellement automatique
+      cron:
+        name: "Renouvellement certificat SecureBank"
+        minute: "0"
+        hour: "2"
+        day: "1"
+        job: "/usr/local/bin/renew-cert.sh"
+
+  handlers:
+    - name: Restart haproxy
+      service:
+        name: haproxy
+        state: restarted 

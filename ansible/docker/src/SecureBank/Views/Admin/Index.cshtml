@@ -1,0 +1,99 @@
+﻿@inject Microsoft.Extensions.Options.IOptions<SecureBank.Ctf.Models.CtfOptions> _ctfOptions
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="container-fluid">
+    <div class="container">
+
+        <h2 class="transTableTitle">All transactions of users</h2>
+        <p class="transTableButtNew">
+            <a class="btn btn-primary" href="/AdminStore/">Admin store</a>
+        </p>
+        <table id="transactionTable" class="table table-hover"></table>
+
+    </div>
+    <hr />
+    <div class="container">
+        <h2 class="transTableTitle">All users</h2>
+        <table id="usersTable" class="table table-hover"></table>
+    </div>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(() => {
+            $('#transactionTable').DataTable({
+                ordering: false,
+                serverSide: false,
+                processing: true,
+                "ajax": "/api/Admin/Transactions",
+                columns: [
+                    {
+                        data: 'senderId',
+                        title: 'Sender',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    },
+                    {
+                        data: 'receiverId',
+                        title: 'Receiver',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    },
+                    {
+                        data: 'dateTime',
+                        title: 'Transaction time',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    },
+                    {
+                        data: 'amount',
+                        title: 'Amount',
+                        mRender: function (rowData) {
+                            return rowData.toFixed(2) + "€";
+                        }
+                    },
+                    {
+                        data: 'reason',
+                        title: 'Reason',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    },
+                    {
+                        data: "id",
+                        title: "View",
+                        mRender: function (rowData) {
+                            return "<a href='/Transaction/Details/" + rowData + "'><button class='btn btn-primary'>Details</button></a>";
+                        }
+                    }
+                ]
+            });
+
+            $('#usersTable').DataTable({
+                ordering: false,
+                serverSide: false,
+                processing: true,
+                "ajax": "/api/Admin/GetAllUsers",
+                columns: [
+                    {
+                        data: 'username',
+                        title: 'User name',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    },
+                    {
+                        data: 'name',
+                        title: 'Name',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    },
+                    {
+                        data: 'surname',
+                        title: 'Surname',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    },
+                    {
+                        data: 'role',
+                        title: 'Role',
+                        @if (!_ctfOptions.Value.CtfChallengeOptions.TableXss) { <text> render: $.fn.dataTable.render.text() </text> }
+                    }
+                ]
+            });
+        });
+    </script>
+}

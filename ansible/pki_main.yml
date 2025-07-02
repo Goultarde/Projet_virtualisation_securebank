@@ -1,0 +1,3 @@
+---
+- import_playbook: cfssl_install.yml
+- import_playbook: cfssl_setup.yml 
