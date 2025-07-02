@@ -280,6 +280,12 @@
         delay: 5
         timeout: 30
 
+    - name: Installer nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
     - name: Configurer nginx pour servir les certificats CA
       copy:
         content: |
