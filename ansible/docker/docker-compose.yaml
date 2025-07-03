@@ -57,7 +57,9 @@ services:
       - SeedingSettings:AdminPassword=admin
       - SeedingSettings:UserPassword=test1
     volumes:
-      -  ./logs/securebank:/app/logs
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - ./logs/securebank:/app/logs
     ports: 
       - 1337:80
   
@@ -74,6 +76,8 @@ services:
       - DatabaseConnections:StoreMSSQL:Database=store
       - StoreAPI:Seed=true
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - ./logs/storeapi:/app/logs
     ports:
       - 1338:80
@@ -86,7 +90,9 @@ services:
       - SA_PASSWORD=Your_Password123
     ports: 
       - 1433:1433
-    volumes: 
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - mssql-data:/var/opt/mssql/backups
       - mssql-data:/var/opt/sqlserver
       - mssql-data:/var/opt/mssql
@@ -100,6 +106,8 @@ services:
     ports:
       - 1434:1433
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - mssql-secondary-data:/var/opt/mssql
       - ./backups:/backups
 
@@ -110,6 +118,8 @@ services:
       - mssql
       - mssql-secondary
     volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
       - ./backups:/backups
     entrypoint: >
       /bin/bash -c "
@@ -132,8 +142,11 @@ services:
   maildev:
     image: maildev/maildev:1.1.0
     container_name: maildev
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
     ports: 
-      - '1080:80'
+      - '127.0.0.1:1080:80'
       - '1025:25'
 
 volumes:

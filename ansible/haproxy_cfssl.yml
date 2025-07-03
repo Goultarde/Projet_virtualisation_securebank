@@ -176,6 +176,9 @@
               http-response set-header Referrer-Policy "no-referrer"
               http-response set-header Permissions-Policy "geolocation=(), microphone=(), camera=()"
               
+              # Route vers Maildev
+              use_backend maildev_servers if { path_beg /mail }
+              
               # Route vers StoreAPI
               use_backend storeapi_servers if { path_beg /api/Store }
               
@@ -197,6 +200,16 @@
               http-request set-header X-Forwarded-Port %[dst_port]
               http-request add-header X-Forwarded-Proto https if { ssl_fc }
               server storeapi 127.0.0.1:1338 check
+
+          backend maildev_servers
+              balance roundrobin
+              option forwardfor
+              http-request set-header X-Forwarded-Port %[dst_port]
+              http-request add-header X-Forwarded-Proto https if { ssl_fc }
+              # Rééécrire l'URL pour maildev
+              http-request set-path %[path,regsub(^/mail/,/)]
+              http-request set-path %[path,regsub(^/mail$,/)]
+              server maildev 127.0.0.1:1080
       notify:
         - Restart haproxy
 

@@ -1,0 +1,68 @@
+---
+- name: Installer et configurer le client NTP
+  hosts: all
+  become: true
+  
+  tasks:
+    - name: Installer chrony
+      apt:
+        name: chrony
+        state: present
+        update_cache: yes
+
+    - name: Configurer chrony comme client NTP
+      copy:
+        dest: /etc/chrony/chrony.conf
+        content: |
+          # Utiliser le serveur NTP local
+          server 192.168.56.42 iburst prefer
+          
+          # Serveurs NTP de secours
+          server 0.pool.ntp.org iburst
+          server 1.pool.ntp.org iburst
+          
+          # Configurer les paramètres locaux
+          driftfile /var/lib/chrony/drift
+          rtcsync
+          
+          # Configurer les journaux
+          logdir /var/log/chrony
+          
+          # Permettre à l'horloge système de se synchroniser avec l'horloge matérielle
+          makestep 1 3
+          
+          # Configuration de sécurité
+          keyfile /etc/chrony/chrony.keys
+          
+        mode: '0644'
+        backup: yes
+
+    - name: Démarrer et activer chrony
+      systemd:
+        name: chrony
+        state: started
+        enabled: yes
+        daemon_reload: yes
+
+    - name: Forcer la synchronisation immédiate
+      command: chronyc makestep
+      changed_when: false
+      ignore_errors: yes
+
+    - name: Vérifier le statut de chrony
+      command: chronyc sources
+      register: chrony_status
+      changed_when: false
+
+    - name: Afficher le statut de chrony
+      debug:
+        msg: "{{ chrony_status.stdout }}"
+
+    - name: Vérifier la synchronisation
+      command: chronyc tracking
+      register: chrony_tracking
+      changed_when: false
+
+    - name: Afficher les informations de synchronisation
+      debug:
+        msg: "{{ chrony_tracking.stdout }}" 

@@ -1,0 +1,2 @@
+---
+- import_playbook: ntp_server_install.yml 

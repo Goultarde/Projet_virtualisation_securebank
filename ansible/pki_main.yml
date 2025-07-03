@@ -1,3 +1,4 @@
 ---
+- import_playbook: ntp_client_install.yml
 - import_playbook: cfssl_install.yml
 - import_playbook: cfssl_setup.yml 
