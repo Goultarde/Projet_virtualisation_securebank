@@ -1,7 +1,7 @@
 # Rapport d'Architecture Sécurisée - Application Bancaire SecureBank
 
 **Projet :** Sécurisation d'une application bancaire en C#  
-**Date :** Décembre 2024  
+**Date :** Juillet 2025  
 **Équipe :** [Nom de l'équipe]  
 **Version :** 1.0  
 
@@ -25,25 +25,25 @@
 
 | **Risque** | **Probabilité** | **Impact** | **Niveau** | **Justification** |
 |------------|----------------|------------|------------|-------------------|
-| **Injection SQL** | Élevée | Critique | Rouge | Application bancaire avec données sensibles |
-| **XSS (Cross-Site Scripting)** | Élevée | Élevé | Rouge | Interface utilisateur vulnérable |
-| **XXE (XML External Entity)** | Moyenne | Critique | Rouge | Upload de fichiers XML non sécurisé |
-| **Authentification faible** | Élevée | Critique | Rouge | Mots de passe faibles acceptés |
-| **Exposition de données sensibles** | Moyenne | Critique | Rouge | Données bancaires exposées |
-| **Path Traversal** | Moyenne | Élevé | Orange | Navigation dans les répertoires |
-| **Contrôle d'accès défaillant** | Élevée | Critique | Rouge | Rôles modifiables via cookies |
-| **Déni de service (reDOS)** | Faible | Moyen | Jaune | Attaques par expression régulière |
-| **Exposition Swagger** | Moyenne | Moyen | Orange | Documentation API accessible |
-| **Réplication non sécurisée** | Faible | Critique | Rouge | Données sensibles en transit |
-| **DDoS (Déni de Service Distribué)** | Élevée | Critique | Rouge | Aucune protection, ports exposés directement |
-| **Interception de trafic** | Élevée | Critique | Rouge | Communication HTTP non chiffrée |
-| **Attaques par force brute** | Élevée | Élevé | Orange | Aucune limitation de tentatives |
+| **Injection SQL** | Élevée | Critique | Critique | Application bancaire avec données sensibles |
+| **XSS (Cross-Site Scripting)** | Élevée | Élevé | Critique | Interface utilisateur vulnérable |
+| **XXE (XML External Entity)** | Moyenne | Critique | Critique | Upload de fichiers XML non sécurisé |
+| **Authentification faible** | Élevée | Critique | Critique | Mots de passe faibles acceptés |
+| **Exposition de données sensibles** | Moyenne | Critique | Critique | Données bancaires exposées |
+| **Path Traversal** | Moyenne | Élevé | Élevé | Navigation dans les répertoires |
+| **Contrôle d'accès défaillant** | Élevée | Critique | Critique | Rôles modifiables via cookies |
+| **Déni de service (reDOS)** | Faible | Moyen | Moyen | Attaques par expression régulière |
+| **Exposition Swagger** | Moyenne | Moyen | Élevé | Documentation API accessible |
+| **Réplication non sécurisée** | Faible | Critique | Critique | Données sensibles en transit |
+| **DDoS (Déni de Service Distribué)** | Élevée | Critique | Critique | Aucune protection, ports exposés directement |
+| **Interception de trafic** | Élevée | Critique | Critique | Communication HTTP non chiffrée |
+| **Attaques par force brute** | Élevée | Élevé | Élevé | Aucune limitation de tentatives |
 
 #### 1.1.2 Classification des Risques - État Initial
 
-- **Rouge (Critique)** : 9 risques - Action immédiate requise
-- **Orange (Élevé)** : 3 risques - Action planifiée requise  
-- **Jaune (Moyen)** : 1 risque - Surveillance continue
+- **Critique** : 9 risques - Action immédiate requise
+- **Élevé** : 3 risques - Action planifiée requise  
+- **Moyen** : 1 risque - Surveillance continue
 
 **État critique :** 9 risques critiques nécessitent une action immédiate, 3 risques élevés nécessitent une action planifiée, et 1 risque moyen nécessite une surveillance continue.
 
@@ -53,38 +53,81 @@
 
 | **Risque** | **Probabilité** | **Impact** | **Niveau** | **Mesures de Protection** |
 |------------|----------------|------------|------------|---------------------------|
-| **Injection SQL** | Faible | Critique | Jaune | WAF HAProxy, validation côté serveur |
-| **XSS (Cross-Site Scripting)** | Faible | Élevé | Jaune | Headers CSP, WAF HAProxy |
-| **XXE (XML External Entity)** | Faible | Critique | Jaune | WAF HAProxy, validation des uploads |
-| **Authentification faible** | Moyenne | Critique | Orange | Rate limiting, politique de mots de passe |
-| **Exposition de données sensibles** | Faible | Critique | Jaune | SSL/TLS, headers de sécurité |
-| **Path Traversal** | Faible | Élevé | Jaune | WAF HAProxy, validation des chemins |
-| **Contrôle d'accès défaillant** | Moyenne | Critique | Orange | Validation côté serveur, cookies sécurisés |
-| **Déni de service (reDOS)** | Faible | Moyen | Jaune | Rate limiting, monitoring |
-| **Exposition Swagger** | Faible | Moyen | Jaune | Accès restreint, authentification |
-| **Réplication non sécurisée** | Faible | Critique | Jaune | Réseau privé, chiffrement des données |
-| **DDoS (Déni de Service Distribué)** | Faible | Critique | Jaune | Rate limiting HAProxy, monitoring |
-| **Interception de trafic** | Faible | Critique | Jaune | SSL/TLS CFSSL, certificats valides |
-| **Attaques par force brute** | Faible | Élevé | Jaune | Rate limiting, verrouillage de compte |
+| **Injection SQL** | Faible | Critique | Moyen | WAF HAProxy, validation côté serveur |
+| **XSS (Cross-Site Scripting)** | Faible | Élevé | Moyen | Headers CSP, WAF HAProxy |
+| **XXE (XML External Entity)** | Faible | Critique | Moyen | WAF HAProxy, validation des uploads |
+| **Authentification faible** | Élevée | Critique | Critique | Nécessite modification de l'application |
+| **Exposition de données sensibles** | Faible | Critique | Moyen | SSL/TLS, headers de sécurité |
+| **Path Traversal** | Faible | Élevé | Moyen | WAF HAProxy, validation des chemins |
+| **Contrôle d'accès défaillant** | Élevée | Critique | Critique | Nécessite modification de l'application |
+| **Déni de service (reDOS)** | Faible | Moyen | Moyen | Rate limiting, monitoring |
+| **Exposition Swagger** | Faible | Moyen | Moyen | Accès restreint, authentification |
+| **Réplication non sécurisée** | Faible | Critique | Moyen | Réseau privé, chiffrement des données |
+| **DDoS (Déni de Service Distribué)** | Faible | Critique | Moyen | Rate limiting HAProxy, monitoring |
+| **Interception de trafic** | Faible | Critique | Moyen | SSL/TLS CFSSL, certificats valides |
+| **Attaques par force brute** | Élevée | Élevé | Élevé | Nécessite modification de l'application |
 
 #### 1.2.2 Classification des Risques - État Sécurisé
 
-- **Rouge (Critique)** : 0 risque - Tous éliminés
-- **Orange (Élevé)** : 2 risques - Surveillance requise  
-- **Jaune (Moyen)** : 11 risques - Sous contrôle
+- **Critique** : 2 risques - Nécessitent modifications applicatives
+- **Élevé** : 1 risque - Surveillance requise  
+- **Moyen** : 10 risques - Sous contrôle
 
-**Amélioration significative :** 0 risque critique, 2 risques élevés nécessitent une surveillance, et 11 risques moyens sont sous contrôle.
+**Amélioration significative :** 2 risques critiques nécessitent des modifications applicatives, 1 risque élevé nécessite une surveillance, et 10 risques moyens sont sous contrôle.
 
 ### 1.3 Comparaison et Bénéfices
 
 | **Métrique** | **AVANT** | **APRÈS** | **Amélioration** |
 |--------------|-----------|-----------|------------------|
-| **Risques Critiques** | 9 | 0 | -100% |
-| **Risques Élevés** | 3 | 2 | -33% |
-| **Risques Moyens** | 1 | 11 | +1000% (contrôlés) |
-| **Niveau de Sécurité Global** | 15% | 85% | +70% |
+| **Risques Critiques** | 9 | 2 | -78% |
+| **Risques Élevés** | 3 | 1 | -67% |
+| **Risques Moyens** | 1 | 10 | +900% (contrôlés) |
+| **Niveau de Sécurité Global** | 15% | 70% | +55% |
 
-**Résultat :** Réduction de 100% des risques critiques, amélioration de 85% du niveau de sécurité global grâce à l'infrastructure sécurisée.
+**Résultat :** Réduction de 78% des risques critiques, amélioration de 70% du niveau de sécurité global grâce à l'infrastructure sécurisée. Les 2 risques critiques restants nécessitent des modifications au niveau de l'application.
+
+### 1.4 Matrice de Risques Détaillée
+
+#### 1.4.1 Matrice AVANT Sécurisation
+
+| **Risque** | **Probabilité** | **Impact** | **Niveau** | **Score** | **Priorité** |
+|------------|----------------|------------|------------|-----------|--------------|
+| **Injection SQL** | Élevée (3) | Critique (5) | Critique | 15 | P1 |
+| **XSS (Cross-Site Scripting)** | Élevée (3) | Élevé (4) | Critique | 12 | P1 |
+| **XXE (XML External Entity)** | Moyenne (2) | Critique (5) | Critique | 10 | P1 |
+| **Authentification faible** | Élevée (3) | Critique (5) | Critique | 15 | P1 |
+| **Exposition de données sensibles** | Moyenne (2) | Critique (5) | Critique | 10 | P1 |
+| **Path Traversal** | Moyenne (2) | Élevé (4) | Élevé | 8 | P2 |
+| **Contrôle d'accès défaillant** | Élevée (3) | Critique (5) | Critique | 15 | P1 |
+| **Déni de service (reDOS)** | Faible (1) | Moyen (3) | Moyen | 3 | P3 |
+| **Exposition Swagger** | Moyenne (2) | Moyen (3) | Élevé | 6 | P2 |
+| **Réplication non sécurisée** | Faible (1) | Critique (5) | Critique | 5 | P1 |
+| **DDoS (Déni de Service Distribué)** | Élevée (3) | Critique (5) | Critique | 15 | P1 |
+| **Interception de trafic** | Élevée (3) | Critique (5) | Critique | 15 | P1 |
+| **Attaques par force brute** | Élevée (3) | Élevé (4) | Élevé | 12 | P2 |
+
+#### 1.4.2 Matrice APRÈS Sécurisation
+
+| **Risque** | **Probabilité** | **Impact** | **Niveau** | **Score** | **Priorité** | **Amélioration** |
+|------------|----------------|------------|------------|-----------|--------------|------------------|
+| **Injection SQL** | Faible (1) | Critique (5) | Moyen | 5 | P2 | -10 |
+| **XSS (Cross-Site Scripting)** | Faible (1) | Élevé (4) | Moyen | 4 | P2 | -8 |
+| **XXE (XML External Entity)** | Faible (1) | Critique (5) | Moyen | 5 | P2 | -5 |
+| **Authentification faible** | Élevée (3) | Critique (5) | Critique | 15 | P1 | 0 |
+| **Exposition de données sensibles** | Faible (1) | Critique (5) | Moyen | 5 | P2 | -5 |
+| **Path Traversal** | Faible (1) | Élevé (4) | Moyen | 4 | P2 | -4 |
+| **Contrôle d'accès défaillant** | Élevée (3) | Critique (5) | Critique | 15 | P1 | 0 |
+| **Déni de service (reDOS)** | Faible (1) | Moyen (3) | Moyen | 3 | P3 | 0 |
+| **Exposition Swagger** | Faible (1) | Moyen (3) | Moyen | 3 | P3 | -3 |
+| **Réplication non sécurisée** | Faible (1) | Critique (5) | Moyen | 5 | P2 | 0 |
+| **DDoS (Déni de Service Distribué)** | Faible (1) | Critique (5) | Moyen | 5 | P2 | -10 |
+| **Interception de trafic** | Faible (1) | Critique (5) | Moyen | 5 | P2 | -10 |
+| **Attaques par force brute** | Élevée (3) | Élevé (4) | Élevé | 12 | P2 | 0 |
+
+**Légende :**
+- **Score :** Probabilité × Impact (1-15)
+- **Priorité :** P1 (Critique), P2 (Élevé), P3 (Moyen)
+- **Amélioration :** Différence de score AVANT/APRÈS
 
 ---
 
