@@ -308,6 +308,104 @@
                 <h2>1. Analyse de Risques</h2>
                 
                 <h3>1.1 Analyse AVANT Sécurisation (Application Docker uniquement)</h3>
+                <div style="margin: 2rem 0;">
+                  <h3 style="text-align:center; margin-bottom:0.5rem;">Matrice de Croisement Risque (Probabilité x Impact)</h3>
+                  <div style="text-align:center; color:#555; font-size:0.95em; margin-bottom:1.5rem;">
+                    <em>Lecture : croisez la probabilité d'occurrence (ligne) et l'impact potentiel (colonne) pour déterminer le niveau de risque.<br>
+                    <span style='color:#69db7c;font-weight:bold;'>TRÈS FAIBLE</span>,
+                    <span style='color:#ffe066;font-weight:bold;'>FAIBLE</span>,
+                    <span style='color:#ffa94d;font-weight:bold;'>MOYEN</span>,
+                    <span style='color:#ff6f59;font-weight:bold;'>ÉLEVÉE</span>,
+                    <span style='color:#d90429;font-weight:bold;'>CRITIQUE</span>
+                    </em>
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table style="border-collapse:separate; border-spacing:0; min-width:600px; margin:auto; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow:0 2px 16px rgba(0,0,0,0.08); border-radius:12px; overflow:hidden; border:2px solid #2a5298;">
+                      <tr style="background:#2a5298; color:white;">
+                        <th style="padding:14px 20px; border-right:2px solid #fff;"> </th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">TRÈS FAIBLE</th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">FAIBLE</th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">MOYEN</th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">ÉLEVÉE</th>
+                        <th style="padding:14px 20px;">CRITIQUE</th>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">PRESQUE CERTAIN</th>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'>
+                            <li>Attaques par force brute</li>
+                            <li>XSS</li>
+                          </ul>
+                        </td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'>
+                            <li>Injection SQL</li>
+                            <li>Authentification faible</li>
+                            <li>Contrôle d'accès défaillant</li>
+                            <li>DDoS</li>
+                          </ul>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">TRÈS PROBABLE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'>
+                            <li>Path Traversal</li>
+                          </ul>
+                        </td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'>
+                            <li>XXE</li>
+                            <li>Exposition de données sensibles</li>
+                            <li>Interception de trafic</li>
+                          </ul>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">POSSIBLE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'>
+                            <li>Exposition Swagger</li>
+                          </ul>
+                        </td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;"></td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">IMPROBABLE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'>
+                            <li>Déni de service (reDOS)</li>
+                          </ul>
+                        </td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'>
+                            <li>Réplication non sécurisée</li>
+                          </ul>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298;">RARE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold;"></td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
                 
                 <h4>1.1.1 Matrice Risques/Impacts - État Initial</h4>
                 <table class="risk-matrix">
@@ -436,6 +534,78 @@
                 </div>
 
                 <h3>1.2 Analyse APRÈS Sécurisation (Infrastructure Vagrant + Docker)</h3>
+                <div style="margin: 2rem 0;">
+                  <h3 style="text-align:center; margin-bottom:0.5rem;">Matrice de Croisement Risque APRÈS Sécurisation</h3>
+                  <div style="text-align:center; color:#555; font-size:0.95em; margin-bottom:1.5rem;">
+                    <em>Lecture : croisez la probabilité d'occurrence (ligne) et l'impact potentiel (colonne) pour déterminer le niveau de risque.<br>
+                    <span style='color:#69db7c;font-weight:bold;'>TRÈS FAIBLE</span>,
+                    <span style='color:#ffe066;font-weight:bold;'>FAIBLE</span>,
+                    <span style='color:#ffa94d;font-weight:bold;'>MOYEN</span>,
+                    <span style='color:#ff6f59;font-weight:bold;'>ÉLEVÉE</span>,
+                    <span style='color:#d90429;font-weight:bold;'>CRITIQUE</span>
+                    </em>
+                  </div>
+                  <div style="overflow-x:auto;">
+                    <table style="border-collapse:separate; border-spacing:0; min-width:600px; margin:auto; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; box-shadow:0 2px 16px rgba(0,0,0,0.08); border-radius:12px; overflow:hidden; border:2px solid #2a5298;">
+                      <tr style="background:#2a5298; color:white;">
+                        <th style="padding:14px 20px; border-right:2px solid #fff;"> </th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">TRÈS FAIBLE</th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">FAIBLE</th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">MOYEN</th>
+                        <th style="padding:14px 20px; border-right:2px solid #fff;">ÉLEVÉE</th>
+                        <th style="padding:14px 20px;">CRITIQUE</th>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">PRESQUE CERTAIN</th>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'><li>Attaques par force brute</li></ul>
+                        </td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'><li>Authentification faible</li><li>Contrôle d'accès défaillant</li></ul>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">TRÈS PROBABLE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;"></td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">POSSIBLE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ff6f59; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;"></td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298; border-bottom:2px solid #2a5298;">IMPROBABLE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'><li>Exposition Swagger</li><li>Réplication non sécurisée</li></ul>
+                        </td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;">
+                          <ul style='margin:0; padding-left:18px;'><li>Injection SQL</li><li>XSS</li><li>XXE</li><li>Exposition de données sensibles</li><li>Path Traversal</li><li>Déni de service (reDOS)</li><li>DDoS</li><li>Interception de trafic</li></ul>
+                        </td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff; border-bottom:2px solid #2a5298;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold; border-bottom:2px solid #2a5298;"></td>
+                      </tr>
+                      <tr>
+                        <th style="padding:12px 16px; background:#f8f9fa; border-right:2px solid #2a5298;">RARE</th>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#69db7c; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#ffe066; font-weight:bold; border-right:2px solid #fff;"></td>
+                        <td style="background:#ffa94d; color:#fff; font-weight:bold;"></td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
                 
                 <h4>1.2.1 Matrice Risques/Impacts - État Sécurisé</h4>
                 <table class="risk-matrix">
@@ -583,269 +753,6 @@
                 <div class="highlight">
                     <strong>Résultat :</strong> Réduction de 78% des risques critiques, amélioration de 70% du niveau de sécurité global grâce à l'infrastructure sécurisée. Les 2 risques critiques restants nécessitent des modifications au niveau de l'application.
                 </div>
-
-                <h3>1.4 Matrice de Risques Détaillée</h3>
-                
-                <h4>1.4.1 Matrice AVANT Sécurisation</h4>
-                <table class="tech-table">
-                    <thead>
-                        <tr>
-                            <th>Risque</th>
-                            <th>Probabilité</th>
-                            <th>Impact</th>
-                            <th>Niveau</th>
-                            <th>Score</th>
-                            <th>Priorité</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Injection SQL</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>15</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>XSS (Cross-Site Scripting)</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Élevé (4)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>12</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>XXE (XML External Entity)</strong></td>
-                            <td>Moyenne (2)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>10</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Authentification faible</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>15</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Exposition de données sensibles</strong></td>
-                            <td>Moyenne (2)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>10</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Path Traversal</strong></td>
-                            <td>Moyenne (2)</td>
-                            <td>Élevé (4)</td>
-                            <td class="risk-high">Élevé</td>
-                            <td>8</td>
-                            <td>P2</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Contrôle d'accès défaillant</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>15</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Déni de service (reDOS)</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Moyen (3)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>3</td>
-                            <td>P3</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Exposition Swagger</strong></td>
-                            <td>Moyenne (2)</td>
-                            <td>Moyen (3)</td>
-                            <td class="risk-high">Élevé</td>
-                            <td>6</td>
-                            <td>P2</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Réplication non sécurisée</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>5</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>DDoS (Déni de Service Distribué)</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>15</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Interception de trafic</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>15</td>
-                            <td>P1</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Attaques par force brute</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Élevé (4)</td>
-                            <td class="risk-high">Élevé</td>
-                            <td>12</td>
-                            <td>P2</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h4>1.4.2 Matrice APRÈS Sécurisation</h4>
-                <table class="tech-table">
-                    <thead>
-                        <tr>
-                            <th>Risque</th>
-                            <th>Probabilité</th>
-                            <th>Impact</th>
-                            <th>Niveau</th>
-                            <th>Score</th>
-                            <th>Priorité</th>
-                            <th>Amélioration</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Injection SQL</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>5</td>
-                            <td>P2</td>
-                            <td>-10</td>
-                        </tr>
-                        <tr>
-                            <td><strong>XSS (Cross-Site Scripting)</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Élevé (4)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>4</td>
-                            <td>P2</td>
-                            <td>-8</td>
-                        </tr>
-                        <tr>
-                            <td><strong>XXE (XML External Entity)</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>5</td>
-                            <td>P2</td>
-                            <td>-5</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Authentification faible</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>15</td>
-                            <td>P1</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Exposition de données sensibles</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>5</td>
-                            <td>P2</td>
-                            <td>-5</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Path Traversal</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Élevé (4)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>4</td>
-                            <td>P2</td>
-                            <td>-4</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Contrôle d'accès défaillant</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-critical">Critique</td>
-                            <td>15</td>
-                            <td>P1</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Déni de service (reDOS)</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Moyen (3)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>3</td>
-                            <td>P3</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Exposition Swagger</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Moyen (3)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>3</td>
-                            <td>P3</td>
-                            <td>-3</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Réplication non sécurisée</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>5</td>
-                            <td>P2</td>
-                            <td>0</td>
-                        </tr>
-                        <tr>
-                            <td><strong>DDoS (Déni de Service Distribué)</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>5</td>
-                            <td>P2</td>
-                            <td>-10</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Interception de trafic</strong></td>
-                            <td>Faible (1)</td>
-                            <td>Critique (5)</td>
-                            <td class="risk-medium">Moyen</td>
-                            <td>5</td>
-                            <td>P2</td>
-                            <td>-10</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Attaques par force brute</strong></td>
-                            <td>Élevée (3)</td>
-                            <td>Élevé (4)</td>
-                            <td class="risk-high">Élevé</td>
-                            <td>12</td>
-                            <td>P2</td>
-                            <td>0</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <div class="highlight">
-                    <strong>Légende :</strong><br>
-                    <strong>Score :</strong> Probabilité × Impact (1-15)<br>
-                    <strong>Priorité :</strong> P1 (Critique), P2 (Élevé), P3 (Moyen)<br>
-                    <strong>Amélioration :</strong> Différence de score AVANT/APRÈS
-                </div>
             </section>
 
             <section id="architecture-technique" class="section">
@@ -860,8 +767,7 @@
                 </div>
                 
                 <h4>Architecture Détaillée</h4>
-                <div class="architecture-diagram">
-┌─────────────────────────────────────────────────────────────────────────────┐
+                <div class="architecture-diagram">┌─────────────────────────────────────────────────────────────────────────────┐
 │                           INFRASTRUCTURE SÉCURISÉE                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
